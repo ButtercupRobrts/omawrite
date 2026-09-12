@@ -26,7 +26,7 @@ ApplicationWindow {
     // `omarchy display text size` drives) anchored so its 12px default leaves
     // the app at the sizes it was designed around.
     readonly property real textScale: backend.textScale
-    readonly property int editorFontPixelSize: scaledSize(20)
+    readonly property int editorFontPixelSize: scaledSize(Math.max(8, Math.min(72, fontSettings.editorFontSize)))
     readonly property int availableEditorWidth:
         Math.max(360, width - Math.round(writerFontMetrics.averageCharacterWidth * 20))
     readonly property int editorWidth: layoutSettings.editorColumns > 0
@@ -55,6 +55,14 @@ ApplicationWindow {
         id: layoutSettings
         category: "layout"
         property int editorColumns: 0
+    }
+
+    // Editor font size in pixels (before text scaling), adjustable with
+    // Ctrl+=/Ctrl+- and reset with Ctrl+0; persisted across sessions.
+    Settings {
+        id: fontSettings
+        category: "layout"
+        property int editorFontSize: 20
     }
 
     onClosing: function(close) {
@@ -223,6 +231,24 @@ ApplicationWindow {
     }
 
     Shortcut {
+        sequences: ["Ctrl+=", "Ctrl++"]
+        context: Qt.ApplicationShortcut
+        onActivated: fontSettings.editorFontSize = Math.min(72, fontSettings.editorFontSize + 1)
+    }
+
+    Shortcut {
+        sequence: "Ctrl+-"
+        context: Qt.ApplicationShortcut
+        onActivated: fontSettings.editorFontSize = Math.max(8, fontSettings.editorFontSize - 1)
+    }
+
+    Shortcut {
+        sequence: "Ctrl+0"
+        context: Qt.ApplicationShortcut
+        onActivated: fontSettings.editorFontSize = 20
+    }
+
+    Shortcut {
         sequence: "Ctrl+Z"
         context: Qt.WindowShortcut
         onActivated: editor.undo()
@@ -345,7 +371,7 @@ ApplicationWindow {
         standardButtons: Dialog.Close
         anchors.centerIn: parent
         contentItem: Label {
-            text: "Ctrl+S  Save\nCtrl+Shift+S  Save As\nCtrl+O  Open\nCtrl+N  New Window\nCtrl+F  Find\nCtrl+H  Find and Replace\nCtrl+B  Bold\nCtrl+I  Italic\nCtrl+K  Link\nCtrl+P  Print\nF11 / Super+F  Fullscreen\nCtrl+?  Shortcuts"
+            text: "Ctrl+S  Save\nCtrl+Shift+S  Save As\nCtrl+O  Open\nCtrl+N  New Window\nCtrl+F  Find\nCtrl+H  Find and Replace\nCtrl+B  Bold\nCtrl+I  Italic\nCtrl+K  Link\nCtrl+P  Print\nCtrl+= / Ctrl+-  Text Size\nCtrl+0  Reset Text Size\nF11 / Super+F  Fullscreen\nCtrl+?  Shortcuts"
             lineHeight: 1.5
         }
     }
