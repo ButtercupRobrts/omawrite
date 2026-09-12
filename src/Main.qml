@@ -28,7 +28,9 @@ ApplicationWindow {
     readonly property real textScale: backend.textScale
     readonly property int editorFontPixelSize: scaledSize(Math.max(8, Math.min(72, fontSettings.editorFontSize)))
     readonly property int availableEditorWidth:
-        Math.max(360, width - Math.round(writerFontMetrics.averageCharacterWidth * 20))
+        Math.max(0, Math.min(
+            width - Math.round(writerFontMetrics.averageCharacterWidth * 20),
+            width - 48))
     readonly property int editorWidth: layoutSettings.editorColumns > 0
         ? Math.min(
               Math.round(writerFontMetrics.averageCharacterWidth * Math.max(20, layoutSettings.editorColumns)),
